@@ -2,6 +2,7 @@ default:
     autoload: [ %paths.base%/test/contexts ]
     suites:
         default:
+            paths: [ %paths.base%/test/features ]
             contexts:
                 - FeatureContext:
                     session:   '@session'
