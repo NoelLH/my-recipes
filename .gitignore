@@ -13,3 +13,6 @@
 
 # IDE meta files
 .idea
+
+# The repo has a minimal SQLite file already checked in - ignore future changes
+app/data/recipes.db3
