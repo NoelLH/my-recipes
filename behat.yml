@@ -1,0 +1,9 @@
+default:
+    autoload: [ %paths.base%/test/contexts ]
+    suites:
+        default:
+            contexts:
+                - FeatureContext:
+                    session:   '@session'
+    extensions:
+        Behat\Symfony2Extension: ~
