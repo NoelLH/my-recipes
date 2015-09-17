@@ -7,7 +7,7 @@ Feature: Filter recipes
   Background:
 
     Given the following recipes exist in the system:
-      | Name                 | Cooking Time | Ingredients                |
+      | Name                 | Cooking Time | Main Ingredients                |
       | Lemon Chicken        | 30 minutes   | Chicken, Lemon, Thyme      |
       | Beef Stroganoff      | 30 minutes   | Beef, Mustard, Mushrooms   |
       | Chicken Caesar Salad | 25 minutes   | Lettuce, Chicken, Parmesan |
