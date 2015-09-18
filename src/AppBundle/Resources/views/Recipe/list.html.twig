@@ -19,25 +19,25 @@
         {% else %}
             <p class="info">Sorry, we currently have no recipes for you</p>
         {% endif %}
-    {% endif %}
-
-    <table id="recipeTable">
-        <tr class="heading">
-            <th>Name</th>
-            <th>Ingredients</th>
-            <th>Cooking Time</th>
-        </tr>
-
-        {% for recipe in recipes %}
-            <tr {% if loop.index is odd %}class="color"{% endif %}>
-                <td class="recipe-name"><a href="{{ path('recipe_view', {id: recipe.id}) }}">{{ recipe.name }}</a></td>
-                        <td class="main-ingredients">
-                            {% for ri in recipe.recipeIngredients %}{% if loop.index > 1 %}, {% endif %}{{ ri.ingredient.name }}{% endfor %}
-                        </td>
-                        <td class="cooking-time">{{ recipe.cookingTime }} minutes</td>
+    {% else %}
+        <table id="recipeTable">
+            <tr class="heading">
+                <th>Name</th>
+                <th>Ingredients</th>
+                <th>Cooking Time</th>
             </tr>
-        {% endfor %}
-    </table>
+
+            {% for recipe in recipes %}
+                <tr {% if loop.index is odd %}class="color"{% endif %}>
+                    <td class="recipe-name"><a href="{{ path('recipe_view', {id: recipe.id}) }}">{{ recipe.name }}</a></td>
+                            <td class="main-ingredients">
+                                {% for ri in recipe.recipeIngredients %}{% if loop.index > 1 %}, {% endif %}{{ ri.ingredient.name }}{% endfor %}
+                            </td>
+                            <td class="cooking-time">{{ recipe.cookingTime }} minutes</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
 
     <div class="navigation">
         {{ knp_pagination_render(recipes) }}
