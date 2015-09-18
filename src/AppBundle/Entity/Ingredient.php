@@ -21,6 +21,12 @@ class Ingredient
     protected $name;
 
     /**
+     * @ORM\OneToMany(targetEntity="RecipeIngredient", mappedBy="ingredient")
+     * @ORM\JoinColumn(name="id", referencedColumnName="ingredient_id")
+     */
+    protected $recipeIngredients;
+
+    /**
      * Get id
      *
      * @return integer
@@ -52,5 +58,46 @@ class Ingredient
     public function getName()
     {
         return $this->name;
+    }
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->recipeIngredients = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+
+    /**
+     * Add recipeIngredient
+     *
+     * @param \AppBundle\Entity\RecipeIngredient $recipeIngredient
+     *
+     * @return Ingredient
+     */
+    public function addRecipeIngredient(\AppBundle\Entity\RecipeIngredient $recipeIngredient)
+    {
+        $this->recipeIngredients[] = $recipeIngredient;
+
+        return $this;
+    }
+
+    /**
+     * Remove recipeIngredient
+     *
+     * @param \AppBundle\Entity\RecipeIngredient $recipeIngredient
+     */
+    public function removeRecipeIngredient(\AppBundle\Entity\RecipeIngredient $recipeIngredient)
+    {
+        $this->recipeIngredients->removeElement($recipeIngredient);
+    }
+
+    /**
+     * Get recipeIngredients
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getRecipeIngredients()
+    {
+        return $this->recipeIngredients;
     }
 }

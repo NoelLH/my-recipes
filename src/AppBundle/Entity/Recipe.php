@@ -38,9 +38,11 @@ class Recipe
     protected $image_url;
 
     /**
-     * @ORM\OneToMany(targetEntity="Ingredient", mappedBy="id")
+     * @ORM\OneToMany(targetEntity="RecipeIngredient", mappedBy="recipe")
+     * @ORM\JoinColumn(name="recipe_id", referencedColumnName="id")
      */
-    protected $ingredients;
+    protected $recipeIngredients;
+
     /**
      * Constructor
      */
@@ -156,36 +158,36 @@ class Recipe
     }
 
     /**
-     * Add ingredient
+     * Add recipeIngredient
      *
-     * @param \AppBundle\Entity\Ingredient $ingredient
+     * @param \AppBundle\Entity\RecipeIngredient $recipeIngredient
      *
      * @return Recipe
      */
-    public function addIngredient(\AppBundle\Entity\Ingredient $ingredient)
+    public function addRecipeIngredient(\AppBundle\Entity\RecipeIngredient $recipeIngredient)
     {
-        $this->ingredients[] = $ingredient;
+        $this->recipeIngredients[] = $recipeIngredient;
 
         return $this;
     }
 
     /**
-     * Remove ingredient
+     * Remove recipeIngredient
      *
-     * @param \AppBundle\Entity\Ingredient $ingredient
+     * @param \AppBundle\Entity\RecipeIngredient $recipeIngredient
      */
-    public function removeIngredient(\AppBundle\Entity\Ingredient $ingredient)
+    public function removeRecipeIngredient(\AppBundle\Entity\RecipeIngredient $recipeIngredient)
     {
-        $this->ingredients->removeElement($ingredient);
+        $this->recipeIngredients->removeElement($recipeIngredient);
     }
 
     /**
-     * Get ingredients
+     * Get recipeIngredients
      *
      * @return \Doctrine\Common\Collections\Collection
      */
-    public function getIngredients()
+    public function getRecipeIngredients()
     {
-        return $this->ingredients;
+        return $this->recipeIngredients;
     }
 }
