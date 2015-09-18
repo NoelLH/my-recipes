@@ -28,6 +28,13 @@ class RecipeIngredient
     protected $ingredient;
 
     /**
+     * Free text quantity description. If it looks like just a number with no unit we'll append ' x '.
+     *
+     * @ORM\Column(type="string", length=50, nullable=true)
+     */
+    protected $quantity = '';
+
+    /**
      * Get id
      *
      * @return integer
@@ -83,5 +90,47 @@ class RecipeIngredient
     public function getIngredient()
     {
         return $this->ingredient;
+    }
+
+    /**
+     * Set quantity
+     *
+     * @param string $quantity
+     *
+     * @return RecipeIngredient
+     */
+    public function setQuantity($quantity)
+    {
+        $this->quantity = $quantity;
+
+        return $this;
+    }
+
+    /**
+     * Get quantity
+     *
+     * @return string
+     */
+    public function getQuantity()
+    {
+        return $this->quantity;
+    }
+
+    /**
+     * Gets the best human-readable description of the quantity (adding ' x ' if no unit) and ingredient name
+     *
+     * @return string
+     */
+    public function getDescription()
+    {
+        $quantity = $this->getQuantity();
+        $lastQuantityCharacter = substr($quantity, -1);
+        if (is_numeric($lastQuantityCharacter)) {
+            $quantity .= ' x ';
+        }
+
+        $description = $quantity . ' ' . $this->getIngredient()->getName();
+
+        return trim($description);
     }
 }
