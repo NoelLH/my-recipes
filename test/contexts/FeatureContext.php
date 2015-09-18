@@ -19,6 +19,8 @@ use Symfony\Component\HttpFoundation\Session\Session;
  */
 class FeatureContext implements Context, SnippetAcceptingContext
 {
+    protected $lastRecipeName;
+
     /**
      * Initializes context.
      *
@@ -41,9 +43,8 @@ class FeatureContext implements Context, SnippetAcceptingContext
         $this->browser->visit('http://localhost:8000/recipes');
     }
 
-    /** @BeforeScenario */
     /** @AfterScenario */
-    public function purgeTestDatabase($event)
+    public function purgeTestDatabase()
     {
         // Purge tables
         $purger = new ORMPurger($this->em);
@@ -81,9 +82,9 @@ class FeatureContext implements Context, SnippetAcceptingContext
             }
 
             $this->em->persist($newRecipe);
-        }
 
-        $this->em->flush();
+            $this->em->flush();
+        }
     }
 
     /**
@@ -297,11 +298,24 @@ class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
+     * Asserts that the recipe with this name is the only one on the list
+     *
      * @Then the recipe :arg1
      */
     public function theRecipe($arg1)
     {
-        throw new PendingException();
+        $this->browser->visit('http://localhost:8000/recipes');
+
+        $recipeNameFields = $this->browser->getPage()->findAll('css', 'td.recipe-name');
+
+        PHPUnit_Framework_Assert::assertCount(1, $recipeNameFields);
+
+        /**
+         * @var \Behat\Mink\Element\NodeElement $field
+         */
+        $field = $recipeNameFields[0];
+
+        PHPUnit_Framework_Assert::assertEquals($arg1, $field->getText());
     }
 
     /**
@@ -309,7 +323,16 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function theCookingTimeOf($arg1)
     {
-        throw new PendingException();
+        $recipeTimeFields = $this->browser->getPage()->findAll('css', 'td.cooking-time');
+
+        PHPUnit_Framework_Assert::assertCount(1, $recipeTimeFields);
+
+        /**
+         * @var \Behat\Mink\Element\NodeElement $field
+         */
+        $field = $recipeTimeFields[0];
+
+        PHPUnit_Framework_Assert::assertEquals($arg1, $field->getText());
     }
 
     /**
@@ -317,7 +340,25 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function theMainIngredientsAreDisplayed(TableNode $table)
     {
-        throw new PendingException();
+        $ingredients = [];
+        foreach ($table->getRows() as $row) {
+            $ingredients[] = $row[0];
+        }
+        sort($ingredients);
+
+        $recipeIngredientsFields = $this->browser->getPage()->findAll('css', 'td.main-ingredients');
+
+        PHPUnit_Framework_Assert::assertCount(1, $recipeIngredientsFields);
+
+        /**
+         * @var \Behat\Mink\Element\NodeElement $field
+         */
+        $field = $recipeIngredientsFields[0];
+
+        $pageIngredients = explode(', ', $field->getText());
+        sort($pageIngredients);
+
+        PHPUnit_Framework_Assert::assertEquals($ingredients, $pageIngredients);
     }
 
     /**
@@ -325,7 +366,12 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function aRecipeIsSelected()
     {
-        throw new PendingException();
+        $this->makeDummyRecipeAndReload();
+
+        $link = $this->browser->getPage()->findLink('Dummy recipe');
+
+        $this->lastRecipeName = $link->getText();
+        $link->click();
     }
 
     /**
@@ -333,23 +379,47 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function iAmTakenToTheRecipePage()
     {
-        throw new PendingException();
+        $heading = $this->browser->getPage()->find('css', 'h1.recipe-name');
+
+        PHPUnit_Framework_Assert::assertEquals($this->lastRecipeName, $heading->getText());
     }
 
     /**
      * @Then the recipes along with their cooking time and main ingredients are displayed:
+     *
+     * @todo Do we need to explicitly check for time & main ingredients here too?
      */
     public function theRecipesAlongWithTheirCookingTimeAndMainIngredientsAreDisplayed(TableNode $table)
     {
-        throw new PendingException();
+        $this->browser->visit('http://localhost:8000/recipes');
+
+        $pageContent = $this->browser->getPage()->getContent();
+
+        foreach ($table->getRows() as $row) {
+            PHPUnit_Framework_Assert::assertContains(
+                '>' . $row[0] . '</a></td>',
+                $pageContent
+            );
+        }
     }
 
     /**
+     * Creates $arg1 + 1 sequentially-named dummy recipes
+     *
      * @When there are more than :arg1 recipes in the system
      */
     public function thereAreMoreThanRecipesInTheSystem($arg1)
     {
-        throw new PendingException();
+        $recipes = [];
+        for ($ii = 0; $ii <= $arg1; $ii++) {
+            $recipes[] = (new Recipe())
+                ->setName('Recipe number ' . $ii)
+                ->setCookingTime(47)
+                ->setInstructions('Placeholder');
+            $this->em->persist($recipes[count($recipes) - 1]);
+        }
+
+        $this->em->flush();
     }
 
     /**
@@ -357,7 +427,11 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function onlyTheFirstRecipesAreShown($arg1)
     {
-        throw new PendingException();
+        $this->browser->visit('http://localhost:8000/recipes');
+
+        $rows = $this->browser->getPage()->findAll('css', 'tr');
+
+        PHPUnit_Framework_Assert::assertCount($arg1 + 1, $rows);
     }
 
     /**
@@ -365,7 +439,11 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function pageNavigationElementsAreDisplayed()
     {
-        throw new PendingException();
+        $this->browser->visit('http://localhost:8000/recipes');
+        $page2Link = $this->browser->getPage()->findLink('2');
+
+        PHPUnit_Framework_Assert::assertNotNull($page2Link);
+        PHPUnit_Framework_Assert::assertEquals('/recipes?page=2', $page2Link->getAttribute('href'));
     }
 
     /**
@@ -438,5 +516,17 @@ class FeatureContext implements Context, SnippetAcceptingContext
     public function theRecipeIsDisplayed($arg1)
     {
         throw new PendingException();
+    }
+
+    protected function makeDummyRecipeAndReload()
+    {
+        $recipe = (new Recipe())
+            ->setName('Dummy recipe')
+            ->setCookingTime(44)
+            ->setInstructions('Placeholder');
+        $this->em->persist($recipe);
+        $this->em->flush();
+
+        $this->browser->reload();
     }
 }

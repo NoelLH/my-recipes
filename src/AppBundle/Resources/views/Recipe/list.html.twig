@@ -31,7 +31,7 @@
         {% for recipe in recipes %}
             <tr {% if loop.index is odd %}class="color"{% endif %}>
                 <td class="recipe-name"><a href="{{ path('recipe_view', {id: recipe.id}) }}">{{ recipe.name }}</a></td>
-                        <td>
+                        <td class="main-ingredients">
                             {% for ri in recipe.recipeIngredients %}{% if loop.index > 1 %}, {% endif %}{{ ri.ingredient.name }}{% endfor %}
                         </td>
                         <td class="cooking-time">{{ recipe.cookingTime }} minutes</td>
