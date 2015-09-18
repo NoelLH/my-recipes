@@ -50,7 +50,8 @@ So far the prototype has only been used locally. The default parameters use SQLi
 An empty database `app/data/recipes.db3` is checked into the repo to make it easier to run the project without
 SQLite configuration or permissions issues, but you may need to update it with:
 
-`php app/console doctrine:schema:update --force` 
+`php app/console doctrine:schema:update --force`
+`php app/console doctrine:schema:update --force --env=test`
 
 ### Running the project
  
@@ -58,26 +59,34 @@ To quickly start a local web server for the project - at http://localhost:8000 -
  
 `php app/console server:start`
 
+### Running tests
+
+Once installed, you can run `bin/behat`, which is configured to test the features in `test`.
+
+These are mostly taken verbatim from the given feature descriptions, while `test/contexts/FeatureContext.php` tells
+Behat how to interpret the scenarios.
+
 ## Testing rich features
 
 We are [using Mink with Behat](http://behat.readthedocs.org/en/v2.5/cookbook/behat_and_mink.html) to do headless
-emulation of actual user actions, for resilient functional testing. Having chosen these tools, as the link
+emulation of user actions for resilient functional testing. Having chosen these tools, as the link
 describes we could easily extend this to do real in-browser testing. This might be more valuable in the future if
 extending the system to include JavaScript and AJAX functionality.
 
 ## Next steps
 
-Unfortunately due to limited time I was not able to build the starring feature. However a major advantage of
+Unfortunately due to limited time I have not yet been able to build the Stars feature. However a major advantage of
 following BDD is that it is easy to verify that the other features are fully implemented as far as specified, and to
 be assured that all aspects of these continue to work while building subsequent features.
 
 ## Likely additions
 
-For this prototype to be converted to an effective real world system, it's likely we would need some simple extensions
-quite early on. In particular, it would benefit from an **administrative interface** for managing recipes, and
-fields to keep basic auditing information about who has created and edited them. So far I have included a user
-management system but not yet required authentication.
+For this prototype to be used as an effective real world system, it's likely we would need some simple extensions
+quite early on. It would especially benefit from an **administrative interface** for managing recipes easily
+rather than by editing a local database with another tool, and fields to keep basic auditing information about who has
+created and edited them. So far I have included a user management system as a dependency for later use, but not yet
+required authentication.
 
 Another top priority would be introducing more modular **unit testing** alongside our scenario-based Behat tests. We are
-already using PHPUnit, so including these to test features like Entity Repository convenience methods would be a
+already using PHPUnit, so including these to test e.g. entity repository convenience methods would be a
 straightforward and valuable addition to ensure code quality going forward.
