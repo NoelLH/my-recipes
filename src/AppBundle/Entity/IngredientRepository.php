@@ -23,6 +23,7 @@ class IngredientRepository extends \Doctrine\ORM\EntityRepository
         if ($ingredient === null) {
             $ingredient = (new Ingredient)
                 ->setName($ingredientName);
+            $this->getEntityManager()->persist($ingredient);
         }
 
         return $ingredient;
