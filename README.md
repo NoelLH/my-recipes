@@ -56,10 +56,15 @@ browser, probably [using Mink with Behat](http://behat.readthedocs.org/en/v2.5/c
 for either in-browser or headless emulation. This could let us test any future JavaScript enhancements effectively
 alongside the existing Behat tests.
 
+## Next steps
+
+Unfortunately due to limited time I was not able to build the starring feature. However a major advantage of
+following BDD is that it is easy to verify that the other features are fully implemented as far as specified, and to
+be assured that all aspects of these continue to work while building subsequent features.
+
 ## Likely additions
 
 For this prototype to be converted to an effective real world system, it's likely we would need some simple extensions
-quite early on, such as:
-
-* An administrative interface for managing recipes, and fields to keep basic auditing information about who has created
-and edited them.
+quite early on. In particular, it would benefit from an administrative interface for managing recipes, and
+fields to keep basic auditing information about who has created and edited them. So far I have included a user
+management system but not yet required authentication.
