@@ -49,12 +49,12 @@ To quickly start a local web server for the project - at http://localhost:8000 -
  
 `php app/console server:start`
 
-## Better testing
+## Testing rich features
 
-It would be advisable to add functional testing that is more tightly coupled with what actually happens in the
-browser, probably [using Mink with Behat](http://behat.readthedocs.org/en/v2.5/cookbook/behat_and_mink.html) to allow
-for either in-browser or headless emulation. This could let us test any future JavaScript enhancements effectively
-alongside the existing Behat tests.
+We are [using Mink with Behat](http://behat.readthedocs.org/en/v2.5/cookbook/behat_and_mink.html) to do headless
+emulation of actual user actions, for hopefully resilient functional testing. Having chosen these tools, as the link
+describes we could easily extend this to do real in-browser testing. This might be more valuable in the future if
+extending the system to include JavaScript and AJAX functionality.
 
 ## Next steps
 
