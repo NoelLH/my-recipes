@@ -1,14 +1,54 @@
 body {
   background: #f9f9f9;
-  font-size: 130%;
-  line-height: 110%;
+  font-size: 110%;
+  line-height: 120%;
   font-family: Helvetica, sans-serif; }
+
+h1 {
+  font-family: "Helvetica Neue", sans-serif;
+  font-weight: 100;
+  font-size: 300%; }
+
+form {
+  margin: 50px 0; }
+
+label {
+  display: block; }
+
+input {
+  font-size: 110%; }
+
+a {
+  color: #55f; }
+
+ul {
+  margin-top: -10px;
+  list-style: circle inside; }
+
+.bottom-link {
+  clear: both; }
+
+input[type="submit"] {
+  background: #fff;
+  border: solid 1px #999;
+  border-radius: 4px; }
+
+table {
+  border-collapse: collapse;
+  border: solid 1px #999; }
+
+th, td {
+  border-style: solid;
+  border-width: 1px 0;
+  padding: 10px 20px;
+  border-color: #999; }
 
 .info {
   background: #ccf;
   border: solid 1px #99f;
   padding: 10px;
-  margin: 10px 0; }
+  margin: 10px 0;
+  border-radius: 4px; }
 
 .recipe-image {
   float: left;

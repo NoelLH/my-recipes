@@ -1,8 +1,60 @@
+$standard-border-colour: #999;
+$standard-border: solid 1px $standard-border-colour;
+
 body {
   background: #f9f9f9;
-  font-size: 130%;
-  line-height: 110%;
+  font-size: 110%;
+  line-height: 120%;
   font-family: Helvetica, sans-serif;
+}
+
+h1 {
+  font-family: "Helvetica Neue", sans-serif;
+  font-weight: 100;
+  font-size: 300%;
+}
+
+form {
+  margin: 50px 0;
+}
+
+label {
+  display: block;
+}
+
+input {
+  font-size: 110%;
+}
+
+a {
+  color: #55f;
+}
+
+ul {
+  margin-top: -10px;
+  list-style: circle inside;
+}
+
+.bottom-link {
+  clear: both;
+}
+
+input[type="submit"] {
+  background: #fff;
+  border: $standard-border;
+  border-radius: 4px;
+}
+
+table {
+  border-collapse: collapse;
+  border: $standard-border;
+}
+
+th, td {
+  border-style: solid;
+  border-width: 1px 0;
+  padding: 10px 20px;
+  border-color: $standard-border-colour;
 }
 
 .info {
@@ -10,6 +62,7 @@ body {
   border: solid 1px #99f;
   padding: 10px;
   margin: 10px 0;
+  border-radius: 4px;
 }
 
 .recipe-image {
