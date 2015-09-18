@@ -126,7 +126,7 @@ class RecipeIngredient
         $quantity = $this->getQuantity();
         $lastQuantityCharacter = substr($quantity, -1);
         if (is_numeric($lastQuantityCharacter)) {
-            $quantity .= ' x ';
+            $quantity .= ' x';
         }
 
         $description = $quantity . ' ' . $this->getIngredient()->getName();
