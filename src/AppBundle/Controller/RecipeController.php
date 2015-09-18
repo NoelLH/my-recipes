@@ -2,6 +2,8 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\Recipe;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -54,5 +56,26 @@ class RecipeController extends Controller
             'filtered' => $filtered,
             'recipes' => $pagination
         ];
+    }
+
+    /**
+     * Shows details for one recipe
+     *
+     * @Route("/recipe/{id}", name="recipe_view")
+     * @param Recipe $recipe    Inferred from URL via ParamConverter annotation
+     * @return Response
+     * @Template()
+     * @ParamConverter("recipe")
+     */
+    public function viewOneAction(Recipe $recipe = null)
+    {
+        if (empty($recipe)) {
+            return $this->render(
+                '@App/error.html.twig',
+                ['error' => "Sorry, this recipe doesn't exist or may have been removed"]
+            );
+        }
+
+        return ['recipe' => $recipe];
     }
 }
