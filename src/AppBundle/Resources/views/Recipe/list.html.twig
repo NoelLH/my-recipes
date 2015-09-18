@@ -1,0 +1,29 @@
+<h1>
+    {{ recipes.getTotalItemCount }} Recipe{% if recipes.getTotalItemCount != 1 %}s{% endif %}
+</h1>
+
+{% if recipes.getTotalItemCount == 0 %}
+    <p class="info">Sorry, we currently have no recipes for you</p>
+{% endif %}
+
+<table>
+    <tr>
+        <th>Name</th>
+        <th>Instructions</th>
+        <th>Ingredients</th>
+    </tr>
+
+    {% for recipe in recipes %}
+        <tr {% if loop.index is odd %}class="color"{% endif %}>
+            <td>{{ recipe.name }}</td>
+            <td>{{ recipe.instructions }}</td>
+            <td>
+    {% for ri in recipe.recipeIngredients %}{% if loop.index > 1 %}, {% endif %}{{ ri.ingredient.name }}{% endfor %}
+            </td>
+        </tr>
+    {% endfor %}
+</table>
+
+<div class="navigation">
+    {{ knp_pagination_render(recipes) }}
+</div>
