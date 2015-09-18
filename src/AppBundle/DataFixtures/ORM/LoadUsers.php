@@ -1,11 +1,11 @@
 <?php
-namespace ApoBundle\DataFixtures\ORM;
+namespace AppBundle\DataFixtures\ORM;
 
 use AppBundle\Entity\User;
 use Doctrine\Common\DataFixtures\FixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 
-class LoadUserData implements FixtureInterface
+class LoadUsers implements FixtureInterface
 {
     /**
      * {@inheritDoc}
