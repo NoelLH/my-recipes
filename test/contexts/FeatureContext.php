@@ -36,6 +36,10 @@ class FeatureContext implements Context, SnippetAcceptingContext
         $driver = new \Behat\Mink\Driver\BrowserKitDriver($client);
         $this->browser = new \Behat\Mink\Session($driver);
         $this->browser->start();
+
+        // Start at this page by default, so that scenarios like 'No recipes available' give a response without
+        // an explicit 'visit the recipe list' step
+        $this->browser->visit('http://localhost:8000/recipes');
     }
 
     /** @BeforeScenario */
@@ -87,7 +91,10 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function theFilterTermIsEntered($arg1)
     {
-        throw new PendingException();
+        $this->browser->visit('http://localhost:8000/recipes');
+
+        $this->browser->getPage()->fillField('filterText', $arg1);
+        $this->browser->getPage()->findButton('Filter')->click();
     }
 
     /**
@@ -95,8 +102,6 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function theMessageIsDisplayed($arg1)
     {
-        $this->browser->visit('http://localhost:8000/recipes');
-
         PHPUnit_Framework_Assert::assertContains(
             '<p class="info">' . $arg1 . '</p>',
             $this->browser->getPage()->getContent()
@@ -104,19 +109,45 @@ class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /**
+     * Specs have no header row and a [0] index field containing recipe's name
+     *
      * @Then the following recipes are displayed:
      */
     public function theFollowingRecipesAreDisplayed(TableNode $table)
     {
-        throw new PendingException();
+        $pageContent = $this->browser->getPage()->getContent();
+
+        foreach ($table->getRows() as $row) {
+            PHPUnit_Framework_Assert::assertContains(
+                '<td class="recipe-name">' . $row[0] . '</td>',
+                $pageContent
+            );
+        }
     }
 
     /**
+     * Specs have no header row and a [0] index field containing recipe's name
+     *
      * @Then only the following recipe is displayed:
      */
     public function onlyTheFollowingRecipeIsDisplayed(TableNode $table)
     {
-        throw new PendingException();
+        $rows = $table->getRows();
+
+        PHPUnit_Framework_Assert::assertCount(1, $rows);
+
+        $row = $rows[0];
+
+        $recipeNameFields = $this->browser->getPage()->findAll('css', '#recipeTable td.recipe-name');
+
+        PHPUnit_Framework_Assert::assertCount(1, $recipeNameFields);
+
+        /**
+         * @var \Behat\Mink\Element\NodeElement $field
+         */
+        $field = $recipeNameFields[0];
+
+        PHPUnit_Framework_Assert::assertEquals($row[0], $field->getText());
     }
 
     /**
@@ -124,7 +155,13 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function theMaximumCookingTimeIsSelected($arg1)
     {
-        throw new PendingException();
+        // UI gives users hints to enter just a number, so let's remove extra text from specs' input values for now
+        $arg1 = trim(str_replace('minutes', '', $arg1));
+
+        $this->browser->visit('http://localhost:8000/recipes');
+
+        $this->browser->getPage()->fillField('maximumCookingTime', $arg1);
+        $this->browser->getPage()->findButton('Filter')->click();
     }
 
     /**

@@ -2,24 +2,38 @@
     {{ recipes.getTotalItemCount }} Recipe{% if recipes.getTotalItemCount != 1 %}s{% endif %}
 </h1>
 
+<form action="{{ path('recipe_list') }}" method="get">
+    <label>Filter:
+        <input name="filterText" type="text" value="{{ app.request.get('filterText') }}"></label>
+    <label>Maximum cooking time (minutes):
+        <input name="maximumCookingTime" type="number" value="{{ app.request.get('maximumCookingTime') }}"></label>
+    <input type="submit" value="Filter">
+</form>
+
 {% if recipes.getTotalItemCount == 0 %}
-    <p class="info">Sorry, we currently have no recipes for you</p>
+    {% if filtered %}
+        <p class="info">Sorry, nothing matched your filter term</p>
+    {% else %}
+        <p class="info">Sorry, we currently have no recipes for you</p>
+    {% endif %}
 {% endif %}
 
-<table>
-    <tr>
+<table id="recipeTable">
+    <tr class="heading">
         <th>Name</th>
-        <th>Instructions</th>
         <th>Ingredients</th>
+        <th>Cooking Time</th>
+        <th>Instructions</th>
     </tr>
 
     {% for recipe in recipes %}
         <tr {% if loop.index is odd %}class="color"{% endif %}>
-            <td>{{ recipe.name }}</td>
-            <td>{{ recipe.instructions }}</td>
+            <td class="recipe-name">{{ recipe.name }}</td>
             <td>
     {% for ri in recipe.recipeIngredients %}{% if loop.index > 1 %}, {% endif %}{{ ri.ingredient.name }}{% endfor %}
             </td>
+            <td>{{ recipe.cookingTime }} minutes</td>
+            <td>{{ recipe.instructions }}</td>
         </tr>
     {% endfor %}
 </table>

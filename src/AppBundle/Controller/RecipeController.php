@@ -20,8 +20,28 @@ class RecipeController extends Controller
      */
     public function listAction(Request $request)
     {
-        $recipes = $this->getDoctrine()->getRepository('AppBundle:Recipe')
-            ->findAll();
+        $filtered = false;
+
+        $repo = $this->getDoctrine()->getRepository('AppBundle:Recipe');
+        $qb = $repo->createQueryBuilder('r')
+            ->leftJoin('r.recipeIngredients', 'ri')
+            ->leftJoin('ri.ingredient', 'i');
+
+        // If the filter text field is non-empty, only return part matches on ingredient name or recipe name
+        if ($request->get('filterText')) {
+            $qb->where('(r.name LIKE :wildcardMatch OR i.name LIKE :wildcardMatch)')
+                ->setParameter('wildcardMatch', '%' . $request->get('filterText') . '%');
+            $filtered = true;
+        }
+
+        // If the maximum cooking time is non-empty, only return recipes with a shorter time in minutes
+        if ($request->get('maximumCookingTime')) {
+            $qb->andWhere('r.cooking_time <= :maxTime')
+                ->setParameter('maxTime', intval($request->get('maximumCookingTime')));
+            $filtered = true;
+        }
+
+        $recipes = $qb->getQuery()->getResult();
 
         $paginator  = $this->get('knp_paginator');
         $pagination = $paginator->paginate(
@@ -30,6 +50,9 @@ class RecipeController extends Controller
             10
         );
 
-        return ['recipes' => $pagination];
+        return [
+            'filtered' => $filtered,
+            'recipes' => $pagination
+        ];
     }
 }
