@@ -1,0 +1,11 @@
+{% extends "AppBundle::layout.html.twig" %}
+
+{# TODO consider overriding Symfony's HTTP Exception handling templates if doing anything more complex #}
+
+{% block content %}
+
+    <h1>Oops!</h1>
+
+    <p class="info">{{ error }}</p>
+
+{% endblock %}
