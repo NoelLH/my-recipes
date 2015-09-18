@@ -2,9 +2,17 @@ default:
     autoload: [ %paths.base%/test/contexts ]
     suites:
         default:
+            type: symfony_bundle
+            bundle: AppBundle
             paths: [ %paths.base%/test/features ]
             contexts:
                 - FeatureContext:
-                    session:   '@session'
+                    em:         '@doctrine.orm.default_entity_manager'
+                    client:     '@test.client'
+                    session:    '@session'
     extensions:
         Behat\Symfony2Extension: ~
+        Behat\MinkExtension:
+            sessions:
+                default:
+                    symfony2: ~
