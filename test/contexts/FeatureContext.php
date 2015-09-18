@@ -32,7 +32,6 @@ class FeatureContext implements Context, SnippetAcceptingContext
         $this->em = $em;
         $this->session = $session;
 
-
         $driver = new \Behat\Mink\Driver\BrowserKitDriver($client);
         $this->browser = new \Behat\Mink\Session($driver);
         $this->browser->start();
@@ -43,7 +42,8 @@ class FeatureContext implements Context, SnippetAcceptingContext
     }
 
     /** @BeforeScenario */
-    public function before($event)
+    /** @AfterScenario */
+    public function purgeTestDatabase($event)
     {
         // Purge tables
         $purger = new ORMPurger($this->em);
@@ -103,7 +103,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
     public function theMessageIsDisplayed($arg1)
     {
         PHPUnit_Framework_Assert::assertContains(
-            '<p class="info">' . $arg1 . '</p>',
+            '<p class="info">' . htmlentities($arg1, ENT_QUOTES) . '</p>',
             $this->browser->getPage()->getContent()
         );
     }
@@ -119,7 +119,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
 
         foreach ($table->getRows() as $row) {
             PHPUnit_Framework_Assert::assertContains(
-                '<td class="recipe-name">' . $row[0] . '</td>',
+                '>' . $row[0] . '</a></td>',
                 $pageContent
             );
         }
@@ -169,7 +169,7 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function aRecipeIsVisitedThatCannotBeFound()
     {
-        throw new PendingException();
+        $this->browser->visit('http://localhost:8000/recipe/-1');
     }
 
     /**
@@ -177,7 +177,15 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function theSystemHasTheFollowingRecipeCookingTimes(TableNode $table)
     {
-        throw new PendingException();
+        foreach ($table->getHash() as $row) {
+            $newRecipe = (new Recipe)
+                ->setName($row['Recipe'])
+                ->setCookingTime($row['Cooking Time'])
+                ->setInstructions('Placeholder instructions');
+            $this->em->persist($newRecipe);
+        }
+
+        $this->em->flush();
     }
 
     /**
@@ -185,7 +193,10 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function theRecipeIsVisited($arg1)
     {
-        throw new PendingException();
+        $recipe = $this->em->getRepository('AppBundle:Recipe')
+            ->findOneBy(['name' => $arg1]);
+
+        $this->browser->visit('http://localhost:8000/recipe/' . $recipe->getId());
     }
 
     /**
@@ -193,7 +204,9 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function theCookingTimeOfIsDisplayed($arg1)
     {
-        throw new PendingException();
+        $time = $this->browser->getPage()->find('css', '.cooking-time')->getText();
+
+        PHPUnit_Framework_Assert::assertEquals($arg1, $time);
     }
 
     /**
@@ -201,7 +214,16 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function theSystemHasTheFollowingRecipeImage(TableNode $table)
     {
-        throw new PendingException();
+        foreach ($table->getHash() as $row) {
+            $newRecipe = (new Recipe)
+                ->setName($row['Recipe'])
+                ->setCookingTime(45)
+                ->setImageUrl($row['Image URL'])
+                ->setInstructions('Placeholder instructions');
+            $this->em->persist($newRecipe);
+        }
+
+        $this->em->flush();
     }
 
     /**
@@ -209,7 +231,9 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function theImageIsDisplayed($arg1)
     {
-        throw new PendingException();
+        $imageSrc = $this->browser->getPage()->find('css', '.recipe-image')->getAttribute('src');
+
+        PHPUnit_Framework_Assert::assertEquals('/' . $arg1, $imageSrc);
     }
 
     /**
@@ -217,7 +241,34 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function theSystemHasTheFollowingRecipeIngredients(TableNode $table)
     {
-        throw new PendingException();
+        $recipeRepo = $this->em->getRepository('AppBundle:Recipe');
+        $ingredientRepo = $this->em->getRepository('AppBundle:Ingredient');
+
+        $ingredients = [];
+        $RIs = [];
+
+        foreach ($table->getHash() as $row) {
+            $recipe = $recipeRepo->findOneBy(['name' => $row['Recipe']]);
+
+            if ($recipe === null) {
+                $recipe = (new Recipe)
+                    ->setName($row['Recipe'])
+                    ->setCookingTime(45)
+                    ->setInstructions('Placeholder');
+                $this->em->persist($recipe);
+            }
+
+            $ingredients[] = $ingredientRepo->getOrMake($row['Ingredient']);
+
+            $RIs[] = (new RecipeIngredient())
+                ->setIngredient($ingredients[count($ingredients) - 1])
+                ->setRecipe($recipe)
+                ->setQuantity($row['Quantity']);
+            $this->em->persist($RIs[count($RIs) - 1]);
+
+            $this->em->persist($recipe);
+            $this->em->flush();
+        }
     }
 
     /**
@@ -225,7 +276,14 @@ class FeatureContext implements Context, SnippetAcceptingContext
      */
     public function theIngredientsAreListed(TableNode $table)
     {
-        throw new PendingException();
+        $ingredientsHtml = $this->browser->getPage()->find('css', '.ingredients-list')->getOuterHtml();
+
+        foreach ($table->getRows() as $row) {
+            PHPUnit_Framework_Assert::assertContains(
+                '<li>' . $row[0] . '</li>',
+                $ingredientsHtml
+            );
+        }
     }
 
     /**
